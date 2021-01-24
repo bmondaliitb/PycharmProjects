@@ -1,4 +1,7 @@
 import ROOT
+import root_numpy
+import numpy as np
+import  math
 
 class Histogramming:
     def __init__(self,histName):
@@ -12,10 +15,60 @@ class Histogramming:
 class EtaPhiImage:
     def __init__(self, hist):
         self.hist = hist
-        self.hist_matrix = ROOT.TMatrixD(40+2, 40+2, self.hist.GetArray(), "D")
+        #self.hist_matrix = ROOT.TMatrixD(40, 40, self.hist.GetArray(), "D")
+        self.hist_matrix = root_numpy.hist2array(self.hist)
+        self.hist_matrix = np.rot90(self.hist_matrix) #rotate by 90 degree
 
     def get_matrix(self):
         return self.hist_matrix
+
+    ## taking pt and eta of the object
+    ## I would want to shift to center
+    def center_the_photon(self, eta, phi):
+        centerX = 20
+        centerY = 20
+        eta = truncate((eta/0.2), 0)
+        phi = truncate((phi/0.2), 0)
+        phi = 40 - (centerY + int(phi) + 1)
+        eta = centerX + int(eta)
+        # the central bin is 20, 20
+        self.hist_matrix[20][20] =  self.hist_matrix[phi][eta] # set the central bin with photon
+        self.hist_matrix[phi][eta] = 0 # now set the original position of the photon to zero
+        #print(self.hist_matrix[phi][eta])
+        return self.hist_matrix
+
+    def get_real_etaphi(self, eta, phi):
+        centerX = 20
+        centerY = 20
+        eta = truncate((eta/0.2), 0)
+        phi = truncate((phi/0.2), 0)
+        phi = 40 - (centerY + int(phi) + 1)
+        eta = centerX + int(eta)
+
+        return eta, phi
+
+
+    def get_the_coordinateShift(self, eta, phi):
+        centerX = 20
+        centerY = 20
+        eta = truncate((eta / 0.2), 0)
+        phi = truncate((phi / 0.2), 0)
+        phi = 40 - (centerY + int(phi) + 1)
+        eta = centerX + int(eta)
+        eta_shift = 20 - eta
+        phi_shift = 20 - phi
+        return int(eta_shift), int(phi_shift)
+
+    def shift_the_obj(self, shift_eta, shift_phi, eta, phi):
+        self.hist_matrix[int(eta) - shift_eta][int(phi) - shift_phi] = self.hist_matrix[int(eta)][int(phi)] # shift the obj
+        #self.hist_matrix[int(eta)][int(phi)] = 0 # reset previous value to 0
+        #print(self.hist_matrix[int(eta) - shift_eta][int(phi) - shift_phi])
+        #print(self.hist_matrix[int(eta)][int(phi)])
+        return self.hist_matrix
+
+
+
+
 
 class ReadRootFile:
     # constructor of this class
@@ -98,3 +151,7 @@ class ReadRootFile:
     def drawVariable(self, histname, variable):
         hist = ReadRootFile.loopOverTree(histname, variable)
         hist.Draw()
+
+
+def truncate(f, n):
+    return math.floor(f * 10 ** n) / 10 ** n
