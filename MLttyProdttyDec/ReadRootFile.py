@@ -90,8 +90,7 @@ class ReadRootFile:
 
     def getVarList(self, tree, var ):
         list = []
-        #for entryNum in range(0, tree.GetEntries()):
-        for entryNum in range(0, 110):
+        for entryNum in range(0, tree.GetEntries()):
             tree.GetEntry(entryNum)
             # apply the cut
             ph_id_tight = getattr(tree, "ph_id_tight")

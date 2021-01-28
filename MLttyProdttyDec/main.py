@@ -18,18 +18,15 @@ class Event_variables:
 
 
 
-def loop_over_files():
+def loop_over_files(rootfiles):
     # Open the root file with ReadRootFile class
-    rootfiles = ["/home/bmondal/lxplus_server/eos/physics_analysis/tty/dilepton_mini_ntuple/mc16a_TOPQ1_ttgamma_NLO_prod412112.1.root"]
-    #rootfiles.append("/home/bmondal/lxplus_server/eos/physics_analysis/tty/dilepton_mini_ntuple/mc16d_TOPQ1_ttgamma_NLO_prod412112.1.root")
-    #rootfiles.append("/home/bmondal/lxplus_server/eos/physics_analysis/tty/dilepton_mini_ntuple/mc16e_TOPQ1_ttgamma_NLO_prod412112.1.root")
 
-    decrootfiles = ["/home/bmondal/lxplus_server/eos/physics_analysis/tty/dilepton_mini_ntuple/mc16a_TOPQ1_ttgamma_LO_dec412114.1.root"]
-    #decrootfiles.append("/home/bmondal/lxplus_server/eos/physics_analysis/tty/dilepton_mini_ntuple/mc16d_TOPQ1_ttgamma_LO_dec412114.1.root")
-    #decrootfiles.append("/home/bmondal/lxplus_server/eos/physics_analysis/tty/dilepton_mini_ntuple/mc16e_TOPQ1_ttgamma_LO_dec412114.1.root")
 
     hist = ROOT.TH2D("tty", "phi vs eta", 40, -4.0, 4.0, 40, -4.0, 4.0)
-    hist1 = ROOT.TH2D("tty", "phi vs eta", 60, -4.0, 4.0, 60, -4.0, 4.0)
+    #hist1 = ROOT.TH2D("tty", "phi vs eta", 60, -4.0, 4.0, 60, -4.0, 4.0)
+
+    # make a list to return the final images in a list format
+    shifted_images = []
     for file in rootfiles:
         rootfile_obj = ReadRootFile(file)
         treeNominal = rootfile_obj.getTree("nominal")  # get the nominal tree
@@ -42,7 +39,7 @@ def loop_over_files():
         print("size of eta {0}    size of phi {1}".format(len(elmuph_eta), len(elmuph_phi)))
 
         # make an image containing two leptons and ph in the eta phi space
-        for event in range(0,100):
+        for event in range(0, treeNominal.GetEntries()):
             hist.Reset()
             hist.Fill(elmuph_eta[event][0], elmuph_phi[event][0], elmuph_pt[event][0])
             hist.Fill(elmuph_eta[event][1], elmuph_phi[event][1], elmuph_pt[event][1])
@@ -50,10 +47,11 @@ def loop_over_files():
             hist.Fill(elmuph_eta[event][3], elmuph_phi[event][3], elmuph_pt[event][3])
             hist.Fill(elmuph_eta[event][4], elmuph_phi[event][4], elmuph_pt[event][4])
 
+            # convert 2d hist to matrix
             image_operation = EtaPhiImage(hist)
             hist_matrix = image_operation.get_matrix()
             # make a new array
-            image = np.zeros((60, 60))
+            image = np.zeros((80, 80))
             #print(elmuph_pt[event][2])
 
             etaphoton, phiphoton = image_operation.get_real_etaphi(elmuph_eta[event][2], elmuph_phi[event][2]) # original eta and phi of photon
@@ -61,42 +59,41 @@ def loop_over_files():
                                                                            elmuph_phi[event][2])
             for obj in range(0, 5):
                 eta, phi = image_operation.get_real_etaphi(elmuph_eta[event][obj], elmuph_phi[event][obj])
-                #shift_eta, shift_phi = image_operation.get_the_coordinateShift(elmuph_eta[event][obj], elmuph_phi[event][obj])
-                print("shift eta: {} shift phi {}".format(shift_etaphoton, shift_phiphoton))
-                print(hist_matrix[phi][eta])
-            #hist_matrix = image_operation.center_the_photon(elmuph_eta[event][2], elmuph_phi[event][2]) # center the photon
-            # shift other objects
-            #hist_matrix = image_operation.shift_the_obj(shift_eta, shift_phi, elmuph_eta[event][0], elmuph_phi[event][0]) # shift lepton1
-            #hist_matrix = image_operation.shift_the_obj(shift_eta, shift_phi, elmuph_eta[event][1], elmuph_phi[event][1]) # shift lepton2
-            #hist_matrix = image_operation.shift_the_obj(shift_eta, shift_phi, elmuph_eta[event][3], elmuph_phi[event][3]) # shift  jet1
-            #hist_matrix = image_operation.shift_the_obj(shift_eta, shift_phi, elmuph_eta[event][4], elmuph_phi[event][4]) # shift  jet2
+                #print("shift eta: {} shift phi {}".format(shift_etaphoton, shift_phiphoton))
+                #print(hist_matrix[phi][eta])
 
-                image[phi + shift_phiphoton +10 ][eta + shift_etaphoton + 10] = hist_matrix[phi][eta]
+                image[phi + shift_phiphoton +20 ][eta + shift_etaphoton + 20] = hist_matrix[phi][eta] # make new image with shifted entries
 
-            root_numpy.array2hist(image, hist1)
+            shifted_images.append(image)
 
-            c = ROOT.TCanvas("c")
-            hist1.Draw("colztext")
-            c.Print("hist_{}.png".format(event))
+    return shifted_images
 
-        # convert 2d hist to matrix
-        #image_operation = EtaPhiImage(hist)
-        #hist_matrix = image_operation.get_matrix()  # hist matrix is of TMatrix type
-        #print(hist_matrix)
-        #print(elmuph_pt[3][2])
-        #image_operation.center_the_photon(elmuph_eta[3][2], elmuph_phi[3][2])
-        #for row in range(0,40):
-        #    for col in range(0,40):
-        #        if(not(hist_matrix[row][col] == 0)):
-        #            print("{:4}".format(hist_matrix[row][col]), end=' ')
-        #            print("row: {} col {}".format(row, col))
-        #    #print()
 
+
+def print_array(hist_matrix):
+    for row in range(0,80):
+       for col in range(0,80):
+           #if(not(hist_matrix[row][col] == 0)):
+           print("{:4}".format(hist_matrix[row][col]), end=' ')
+           #    print("row: {} col {}".format(row, col))
+       print()
+
+def save_images(image, hist1, eventnumber):
+    root_numpy.array2hist(image, hist1) # this converts numpy array to histogram
+    c = ROOT.TCanvas("c")
+    hist1.Draw("colztext")
+    c.Print("hist_{}.png".format(eventnumber)) # to print this histogram
 
 
 
 if __name__ == '__main__':
     print("রাং")
-    hist = loop_over_files()
+    rootfiles = ["/home/bmondal/lxplus_server/eos/physics_analysis/tty/dilepton_mini_ntuple/mc16a_TOPQ1_ttgamma_NLO_prod412112.1.root"]
+    #rootfiles.append("/home/bmondal/lxplus_server/eos/physics_analysis/tty/dilepton_mini_ntuple/mc16d_TOPQ1_ttgamma_NLO_prod412112.1.root")
+    #rootfiles.append("/home/bmondal/lxplus_server/eos/physics_analysis/tty/dilepton_mini_ntuple/mc16e_TOPQ1_ttgamma_NLO_prod412112.1.root")
 
+    decrootfiles = ["/home/bmondal/lxplus_server/eos/physics_analysis/tty/dilepton_mini_ntuple/mc16a_TOPQ1_ttgamma_LO_dec412114.1.root"]
+    #decrootfiles.append("/home/bmondal/lxplus_server/eos/physics_analysis/tty/dilepton_mini_ntuple/mc16d_TOPQ1_ttgamma_LO_dec412114.1.root")
+    #decrootfiles.append("/home/bmondal/lxplus_server/eos/physics_analysis/tty/dilepton_mini_ntuple/mc16e_TOPQ1_ttgamma_LO_dec412114.1.root")
 
+    shifted_images = loop_over_files(rootfiles)
