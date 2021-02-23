@@ -1,3 +1,9 @@
 */venv
 */*.root
 */*.png
+*/*.data*
+*/*.index*
+*/*.meta
+*/ML_model
+*/*.h5
+*/*checkpoint
