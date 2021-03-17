@@ -87,7 +87,6 @@ def save_images(image, hist1, eventnumber):
 
 
 if __name__ == '__main__':
-    print("রাং")
     rootfiles = ["/home/bmondal/lxplus_server/eos/physics_analysis/tty/dilepton_mini_ntuple/mc16a_TOPQ1_ttgamma_NLO_prod412112.1.root"]
     #rootfiles.append("/home/bmondal/lxplus_server/eos/physics_analysis/tty/dilepton_mini_ntuple/mc16d_TOPQ1_ttgamma_NLO_prod412112.1.root")
     #rootfiles.append("/home/bmondal/lxplus_server/eos/physics_analysis/tty/dilepton_mini_ntuple/mc16e_TOPQ1_ttgamma_NLO_prod412112.1.root")
