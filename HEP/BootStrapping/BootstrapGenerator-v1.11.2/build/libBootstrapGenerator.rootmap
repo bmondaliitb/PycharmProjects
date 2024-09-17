@@ -1,0 +1,15 @@
+[ libBootstrapGenerator.dylib ]
+# List of selected classes
+class BootstrapGenerator
+class TH1Bootstrap
+class TH1DBootstrap
+class TH1FBootstrap
+class TH2Bootstrap
+class TH2DBootstrap
+class TH2FBootstrap
+class TH3Bootstrap
+class TH3DBootstrap
+header BootstrapGenerator/BootstrapGenerator.h
+header BootstrapGenerator/TH1Bootstrap.h
+header BootstrapGenerator/TH2Bootstrap.h
+header BootstrapGenerator/TH3Bootstrap.h

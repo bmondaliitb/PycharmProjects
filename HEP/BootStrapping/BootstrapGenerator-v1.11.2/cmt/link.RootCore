@@ -1,0 +1,51 @@
+# Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
+
+#!/bin/bash
+
+package=$(${ROOTCOREDIR}/scripts/get_field.sh Makefile.RootCore PACKAGE)
+
+if test "$ROOTCORECONFIG" == ""
+then
+   ######### Older versions of RootCore ############
+
+   ${ROOTSYS}/bin/rlibmap -o ../StandAlone/lib${package}.so.rootmap -l ../StandAlone/lib${package}.so -d -c ../Root/LinkDef.h
+   
+   if test "$ROOTCOREOBJ" == ""
+   then
+       objdir="../../${package}"
+   else
+       objdir=$ROOTCOREOBJ/${package}
+   fi
+   
+   test -f $objdir/StandAlone/lib${package}.so.rootmap && ln -sf $objdir/StandAlone/lib${package}.so.rootmap $ROOTCOREBIN/lib/
+else
+   ####### Recent versions of RootCore #############
+
+   obj_name=lib${package}.so
+   rootmap_name=${obj_name}.rootmap
+
+   obj_path=${ROOTCOREBIN}/obj/${ROOTCORECONFIG}/${package}/lib
+   link_path=${ROOTCOREBIN}/lib/${ROOTCORECONFIG}
+   obj_relpath=../../obj/${ROOTCORECONFIG}/${package}/lib
+
+   # For rootcling all the header files for dictionaries/rootmap files need to be passed, which I do using the Reflex recommmended single header file...
+   includes=../${package}/${package}Dict.h
+
+   export rootversion=`${ROOTSYS}/bin/root-config --version`
+   if test "${rootversion:0:1}" == "6"; then
+      #---- ROOT6
+      cp ${obj_path}/${obj_name} ${obj_name}
+      ${ROOTSYS}/bin/rootcling -f dict${package}.cxx -rml ${obj_name} -rmf ${rootmap_name} ${includes} ../Root/LinkDef.h
+      mv ${rootmap_name} ${obj_path}/${rootmap_name}
+      rm -f dict${package}* ${obj_name}
+   else
+      #---- ROOT5 and below
+      cp ${obj_path}/${obj_name} ${obj_name}
+      ${ROOTSYS}/bin/rlibmap -o ${rootmap_name} -l ${obj_name} -d -c ../Root/LinkDef.h
+      mv ${rootmap_name} ${obj_path}/${rootmap_name}
+      rm -f ${obj_name}
+   fi
+
+   chmod a+x ${obj_path}/${rootmap_name}
+   test -f ${obj_path}/${rootmap_name} && ln -sf ${obj_relpath}/${rootmap_name} ${link_path}/
+fi

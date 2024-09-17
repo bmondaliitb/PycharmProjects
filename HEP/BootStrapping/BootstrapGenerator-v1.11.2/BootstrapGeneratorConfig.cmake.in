@@ -1,0 +1,7 @@
+# Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
+
+# Compute paths
+get_filename_component(BootstrapGenerator_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+set(BootstrapGenerator_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
+set(BootstrapGenerator_LIBRARIES "@CONF_LIBRARIES@")
+set(BootstrapGenerator_LIBRARY_DIRS "@CONF_LIBRARY_DIRS@")

@@ -1,0 +1,66 @@
+# Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
+
+################################################################################
+# Project: BootstrapGenerator
+################################################################################
+
+# CMakeLists.txt for BootstrapGenerator package. It creates a library with dictionary and a main program
+cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
+project(BootstrapGenerator)
+
+# Tell CMake where to find the ROOT installation
+# If ROOT was built using make (and not cmake) use the below line instead:
+#  list(APPEND CMAKE_MODULE_PATH $ENV{ROOTSYS}/etc/cmake)
+list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
+
+#---Locate the ROOT package and defines a number of variables (e.g. ROOT_INCLUDE_DIRS)
+find_package(ROOT REQUIRED COMPONENTS Matrix Hist RIO MathCore Physics)
+
+#---Define useful ROOT functions and macros (e.g. ROOT_GENERATE_DICTIONARY)
+include(${ROOT_USE_FILE})
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
+ROOT_GENERATE_DICTIONARY(G__BootstrapGenerator
+  BootstrapGenerator/BootstrapGenerator.h
+  BootstrapGenerator/TH1Bootstrap.h
+  BootstrapGenerator/TH2Bootstrap.h
+  BootstrapGenerator/TH3Bootstrap.h
+  LINKDEF Root/LinkDef.h)
+
+#---Create a shared library with geneated dictionary
+add_library(BootstrapGenerator SHARED
+  Root/BootstrapGenerator.cxx
+  Root/TH1Bootstrap.cxx
+  Root/TH2Bootstrap.cxx
+  Root/TH3Bootstrap.cxx
+  Root/mersenne.cxx
+  Root/sfmt.cxx
+  Root/stoc1.cxx
+  Root/stoc2.cxx
+  Root/userintf.cxx
+  G__BootstrapGenerator.cxx)
+target_link_libraries(BootstrapGenerator ${ROOT_LIBRARIES})
+
+#---Create  a main program using the library
+add_executable(simpleTest test/simpleTest.cxx)
+target_link_libraries(simpleTest BootstrapGenerator)
+
+install(TARGETS BootstrapGenerator DESTINATION lib)
+install(
+  FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/libBootstrapGenerator_rdict.pcm
+    ${CMAKE_CURRENT_BINARY_DIR}/libBootstrapGenerator.rootmap
+  DESTINATION lib)
+install(TARGETS simpleTest DESTINATION bin)
+install(
+  FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/BootstrapGenerator/BootstrapGenerator.h"        
+    "${CMAKE_CURRENT_SOURCE_DIR}/BootstrapGenerator/TH1Bootstrap.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/BootstrapGenerator/TH2Bootstrap.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/BootstrapGenerator/TH3Bootstrap.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/BootstrapGenerator/TH1DBootstrap.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/BootstrapGenerator/TH2DBootstrap.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/BootstrapGenerator/TH3DBootstrap.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/BootstrapGenerator/TH1FBootstrap.h"
+  DESTINATION include/BootstrapGenerator)

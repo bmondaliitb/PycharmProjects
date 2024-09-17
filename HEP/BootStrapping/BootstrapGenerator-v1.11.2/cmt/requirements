@@ -1,0 +1,36 @@
+# Copyright (C) 2002-2021 CERN for the benefit of the ATLAS collaboration
+
+package BootstrapGenerator
+
+author Chris Meyer <chris.meyer@cern.ch>
+
+public  
+
+# Central package(s)
+use AtlasPolicy AtlasPolicy-*
+use AtlasROOT   AtlasROOT-*   External
+
+# We need a few extra ROOT libraries
+apply_tag ROOTBasicLibs
+apply_tag ROOTMathLibs
+
+apply_pattern installed_library
+library BootstrapGenerator ../Root/*.cxx
+
+macro_append BootstrapGenerator_dependencies " BootstrapGeneratorDict "
+
+apply_pattern have_root_headers root_headers="BootstrapGenerator.h \
+                                              TH1Bootstrap.h \
+                                              TH1DBootstrap.h \
+                                              TH2Bootstrap.h \
+                                              TH2DBootstrap.h \
+                                              TH3Bootstrap.h \
+                                              TH3DBootstrap.h \
+                                              ../Root/LinkDef.h" \
+                                headers_lib="BootstrapGenerator"
+
+private
+
+macro_append cppflags " -msse2 "
+
+end_private

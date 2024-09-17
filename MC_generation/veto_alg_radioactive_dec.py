@@ -33,7 +33,7 @@ def radioactive_decay_veto_algorithm(lambda_decay, N0, t_max):
 
 # Parameters
 lambda_decay = 0.05  # Decay rate
-N0 = 1000000  # Initial number of atoms
+N0 = 10000  # Initial number of atoms
 t_max = 100  # Maximum simulation time
 
 # Simulate radioactive decay

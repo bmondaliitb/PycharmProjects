@@ -16,37 +16,37 @@ Count the number of points inside the quadrant, i.e. having a distance from the 
 The ratio of the inside-count and the total-sample-count is an estimate of the ratio of the two areas, 
 π/4. Multiply the result by 4 to estimate π.
 """
-
-import random
-
-def approximate_pi(num_samples):
-    """
-    Approximate the value of π using the Monte Carlo method.
-
-    Parameters:
-    - num_samples: The number of random points to generate.
-
-    Returns:
-    - The approximate value of π.
-    """
-    inside_count = 0
-
-    for _ in range(num_samples):
-        # Generate random x, y points in the range [-1, 1]
-        x, y = random.uniform(-1, 1), random.uniform(-1, 1)
-        
-        # Check if the point is inside the quadrant
-        if x**2 + y**2 <= 1:
-            inside_count += 1
-
-    # The ratio of inside_count to num_samples is approximately π/4
-    pi_estimate = 4 * inside_count / num_samples
-    return pi_estimate
-
-# Example usage
-num_samples = 1000000  # Number of samples
-estimated_pi = approximate_pi(num_samples)
-print(f"Estimated π with {num_samples} samples: {estimated_pi}")
+def calculate_pi_from_circle_area():
+  import random
+  
+  def approximate_pi(num_samples):
+      """
+      Approximate the value of π using the Monte Carlo method.
+  
+      Parameters:
+      - num_samples: The number of random points to generate.
+  
+      Returns:
+      - The approximate value of π.
+      """
+      inside_count = 0
+  
+      for _ in range(num_samples):
+          # Generate random x, y points in the range [-1, 1]
+          x, y = random.uniform(-1, 1), random.uniform(-1, 1)
+          
+          # Check if the point is inside the quadrant
+          if x**2 + y**2 <= 1:
+              inside_count += 1
+  
+      # The ratio of inside_count to num_samples is approximately π/4
+      pi_estimate = 4 * inside_count / num_samples
+      return pi_estimate
+  
+  # Example usage
+  num_samples = 1000000  # Number of samples
+  estimated_pi = approximate_pi(num_samples)
+  print(f"Estimated π with {num_samples} samples: {estimated_pi}")
 
 
 """
@@ -54,22 +54,50 @@ Example 2
 An illustration of Monte Carlo integration. In this example, the domain D is the inner circle and the domain E is the square. Because the square's area (4) can be easily calculated, the area of the circle (π*1.02) can be estimated by the ratio (0.8) of the points inside the circle (40) to the total number of points (50), yielding an approximation for the circle's area of 4*0.8 = 3.2 ≈ π.
 """
 
-from numpy import random
-import numpy as np
+def calculate_area_square_box():
+  from numpy import random
+  import numpy as np
+  
+  throws = 2000
+  inside_circle = 0
+  i = 0
+  radius = 1
+  while i < throws:
+      # Choose random X and Y centered around 0,0
+      x = random.uniform(-radius, radius)
+      y = random.uniform(-radius, radius)
+      # If the point is inside circle, increase variable
+      if x**2 + y**2 <= radius**2:
+          inside_circle += 1
+      i += 1
+  
+  # Calculate area and print; should be closer to Pi with increasing number of throws
+  area = (((2 * radius) ** 2) * inside_circle) / throws
+  print(area)
 
-throws = 2000
-inside_circle = 0
-i = 0
-radius = 1
-while i < throws:
-    # Choose random X and Y centered around 0,0
-    x = random.uniform(-radius, radius)
-    y = random.uniform(-radius, radius)
-    # If the point is inside circle, increase variable
-    if x**2 + y**2 <= radius**2:
-        inside_circle += 1
-    i += 1
+""" using polar coordinate
+"""
+def calculate_area_circle_polar():
+  import math
+  import random
+  
+  def estimate_circle_area_polar(radius, num_samples):
+      count_inside = 0
+      for _ in range(num_samples):
+          r = math.sqrt(random.random()) * radius  # r^2 is uniformly distributed
+          theta = random.uniform(0, 2 * math.pi)   # theta is uniformly distributed from 0 to 2pi
+          # Every (r, theta) is within the circle by construction
+          count_inside += 1
+  
+      # The area of the circle can be directly calculated from the number of points (all are inside)
+      return count_inside / num_samples * (math.pi * radius ** 2)
+  
+  # Estimate the area of the circle using polar coordinates
+  radius=1
+  num_samples = 100000
+  estimated_area_polar = estimate_circle_area_polar(radius, num_samples)
+  print(f"Area of the circle {estimated_area_polar}")
 
-# Calculate area and print; should be closer to Pi with increasing number of throws
-area = (((2 * radius) ** 2) * inside_circle) / throws
-print(area)
+
+if __name__=="__main__":
+  calculate_area_circle_polar()

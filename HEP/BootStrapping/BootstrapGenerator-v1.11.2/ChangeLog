@@ -1,0 +1,23 @@
+2015-09-17 Christopher Meyer <chris.meyer@cern.ch>
+	* Made TH1Bootstrap destructor public to allow for polymorphic
+	  behavior
+	* Added TH1Bootstrap::GetGenerator() function
+	* Added TH1Bootstrap::ComputeWeights() function
+	* going into BootstrapGenerator-01-10-00
+
+2015-04-30 Christopher John Meyer
+	* Changed from using TH1D::Clone to TH1D::TH1D for array
+	  constructor
+	* going into BootstrapGenerator-01-09-02
+
+2015-04-20 Christopher John Meyer
+	* Added script for merging on the grid using hadd
+	* going into BootstrapGenerator-01-09-01
+
+2015-04-16 Christopher John Meyer
+	* Fixed rootmap generation to avoid absolute paths
+	* going into BootstrapGenerator-01-08-02
+
+2015-03-20 Christopher John Meyer
+	* Updates for rootmap generation in ROOT6
+	* going into BootstrapGenerator-01-08-02
