@@ -1,0 +1,32 @@
+from fpdf import FPDF
+
+class PDF(FPDF):
+    def header(self):
+        self.set_font('Arial', 'B', 12)
+        #self.cell(0, 10, 'Notes', border=False, ln=True, align='C')
+        self.cell(0, 10, '', border=False, ln=True, align='C')
+        self.ln(10)
+
+    def footer(self):
+        self.set_y(-15)
+        self.set_font('Arial', 'I', 8)
+        #self.cell(0, 10, f'Page {self.page_no()}', align='C')
+        #self.cell(0, 10, f'Page {self.page_no()}', align='C')
+
+# Create a blank PDF with multiple pages for note-taking
+pdf = PDF()
+pdf.set_auto_page_break(auto=True, margin=15)
+
+# Add multiple blank pages
+for _ in range(10):  # Adding 10 pages
+    pdf.add_page()
+    pdf.set_font('Arial', size=12)
+    for line in range(25):  # Lines per page
+        pdf.cell(0, 10, '', ln=True)
+
+# Save the PDF
+file_path = "./Blank_Note_Taking_Pages.pdf"
+pdf.output(file_path)
+
+file_path
+
