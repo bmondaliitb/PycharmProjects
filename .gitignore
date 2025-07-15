@@ -7,3 +7,7 @@
 */ML_model
 */*.h5
 */*checkpoint
+
+**/**cmake-build-debug
+**/**.idea
+**/**build
