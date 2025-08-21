@@ -1,0 +1,194 @@
+# Comments March 3, 2025:
+#
+# Function names:
+# ‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐
+#
+# The present tool implementation in c++ knows the following functions:
+#
+# c++ name       | parameters                       | Comment
+# ‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐+‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐+‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐
+# Linear         | [offset,slope]                   | linear transformation offset+slope*x
+# Standard       | [mean,standard_dev]              | standardization (x‐mean)/standard_dev
+# Log            | []                               | ln(x)
+# LogTen         | []                               | log_10(x)
+# CubeRoot       | []                               | |x|^1/3*sign(x)
+# LogStandard    | [mean,standard_dev]              | ln standardization (ln(x)‐mean)/standard_dev (mean,standard_dev from ln(x) distribution in training sample)
+# LogTenStandard | [min,epsilon,mean,standard_dev]  | log_10 standardization (log_10(x)‐mean)/standard_dev (mean,standard_dev from log_10(x) distribution in training sample)
+#                                                       if xmin<=0: x=x-xmin+epsilon; else: xmin=0; epsilon=0
+# MaxAbsolute    | [max_value]                      | x/|max_value|
+#
+# python or c++ syntax could be used as well. It is easy to build dictionaries in c++.
+#
+# Feature data descriptors:
+# ‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐‐
+#
+# I think the default yaml structure to describe a feature could be
+# <feature_name>:
+# name_pt: <name> #name in pytorch
+# unit: None           ‐ a unit specifier using Gaudi standard symbols https://acode‐browser1.usatlas.bnl.gov/lxr/source/Gaudi/GaudiKernel/include/GaudiKernel/SystemOfUnits.h
+#                           (combinations using math operators are possible)
+# preprocessing        ‐ a sequence of pre‐processor function names (see above). In principle c++ or python synatx could be used, but then we need a convention for variable and
+#                           parameter names, like x = variable and { p } = { p0, p1, ... } for parameters (without the {}).
+# parameter: []        ‐ the above men tioned set of parameteres { p }, like [ <p0>, <p1>, ... ]; can be empty (use [] in this case, or leave open?)
+# index: 0             ‐ position (row #) in input tensor
+
+
+
+
+name: config_hgm
+
+data:
+    targets: &targets
+        r_e_calculated:
+            name_pt: r_ems
+            unit: None
+            preprocessing: [LogTen]
+            parameter: []
+    features: &features
+        clusterE:
+            name_pt: e_ems
+            unit: GeV
+            preprocessing: [LogTenStandard]
+            parameter: [0, 0, 0.5383309653195014, 0.628568916276738]
+            index: 0 
+        clusterEta:
+            name_pt: y_ems
+            unit: None
+            preprocessing: [Standard]
+            parameter: [ -0.016698479788232697, 1.0491226036634902]
+            index: 1
+        cluster_SIGNIFICANCE:
+            name_pt: m_sig
+            unit: None
+            preprocessing: [LogTenStandard]
+            parameter: [0, 0, 0.8161004842702827, 0.47155666226363097]
+            index: 2
+        cluster_time:
+            name_pt: t_ems
+            unit: ns
+            preprocessing: [MaxAbsolute]
+            parameter: [475.3998107910156]
+            index: 3
+        cluster_SECOND_TIME:
+            name_pt: m_tim
+            unit: ns*ns
+            preprocessing: [LogTenStandard]
+            parameter: [0.0, 0.0000000001, -0.8516841907428125, 3.5748536072144943]
+            index: 4
+        cluster_CENTER_LAMBDA:
+            name_pt: m_lam
+            unit: mm
+            preprocessing: [LogTenStandard]
+            parameter: [0, 0, 2.4409632778948436, 0.4577559845783319]
+            index: 5
+        cluster_CENTER_MAG:  
+            name_pt: m_cog
+            unit: mm
+            preprocessing: [Standard]
+            parameter: [2862.850422157656, 1046.596737305881]
+            index: 6
+        cluster_ENG_FRAC_EM:
+            name_pt: m_fem
+            unit: None
+            preprocessing: [Standard]
+            parameter: [0.7251406213192042, 0.3307193898602485]
+            index: 7
+        cluster_FIRST_ENG_DENS:
+            name_pt: m_rho
+            unit: GeV/mm3
+            preprocessing: [LogTenStandard]
+            parameter: [0, 0, -6.221791073703417, 0.6510272656508588]
+            index: 8
+        cluster_LONGITUDINAL:
+            name_pt: m_lon
+            unit: None
+            preprocessing: [Standard]
+            parameter: [0.7244948422521433, 0.20203456180857668]
+            index: 9
+        cluster_LATERAL:
+            name_pt: m_lat
+            unit: None
+            preprocessing: [Standard]
+            parameter: [0.7810809975577534, 0.18254495192903947]
+            index: 10
+        cluster_PTD:
+            name_pt: m_ptd
+            unit: None
+            preprocessing: [Standard]
+            parameter: [0.3537810800830943, 0.14271312447959003]
+            index: 11
+        cluster_ISOLATION:
+            name_pt: m_iso
+            unit: None
+            preprocessing: [Standard]
+            parameter: [0.6297078159307947, 0.23074175970958985]
+            index: 12
+        nPrimVtx:
+            name_pt: p_npv
+            unit: None
+            preprocessing: [Standard]
+            parameter: [21.667251149425287, 7.285535657152234]
+            index: 13
+        avgMu:
+            name_pt: p_mmu
+            unit: None
+            preprocessing: [Standard]
+            parameter: [36.596049611635266, 12.789332367456366]
+            index: 14
+
+
+model: 
+    model_name: hgm-mc16-85e5-100ep-espresso
+    init_args:
+        num_layers: 4
+        num_nodes: 64
+        layers: [64, 64, 64, 64]
+        activation: ReLU
+        num_mixtures: 3
+        in_shape: [num_topoclusters, features]
+        input_features: *features
+        targets: *targets
+        in_names: [features, layer0, activation1, layer1, activation2, layer2, activation3, layer3, activation4, layer4]
+        
+    train_args:
+        #num_epochs: 150
+        num_epochs: 100
+        batch_size_trn: 4096
+        batch_size_tst: 512
+        learning_rate: 0.0001
+        lr_milestones: [25, 100]
+        val_every: 2
+        save_every: 25
+        optimizer: Adam
+        weight_decay: 0
+    data_args:
+        mc_release: mc16
+        data_size_trn: 8500000
+        data_size_val: 500000
+        data_size_tst: 5000000 
+        #batch_idxs: [11, 61, 85, 77, 32, 21, 34, 15, 79, 107, 70, 8, 48, 60, 42, 18, 84, 109, 31, 98, 72, 88, 91, 96, 106, 80, 26, 82, 105] 
+        #test
+        #data_size_trn: 30000
+        #data_size_val: 2000
+        #data_size_tst: 20000 
+        batch_idxs: []
+    output:
+        mus:
+            name_pt: mus
+            description: Means of the Gaussian Mixture in log10
+        sigmas:
+            name_pt: sigmas
+            description: Standard deviations of the Gaussian Mixture
+        alphas:
+            name_pt: alphas
+            description: Weights of the Gaussian Mixture
+    prediction: 
+        type: mode
+        name: mode with max LH
+        function: [Linear, Linear]
+        range: [[0., 0.9], [0., 1.1]]
+        nstep: 1000
+   
+
+
+
