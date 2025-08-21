@@ -62,6 +62,7 @@ class FeatureProcessor:
             params = definition.get('parameter', [])
             print(f"  - Processing column '{feature_name}'...")
             
+            # Apply each transformation in the sequence (though the config currently has only one per feature)
             for transform_name in preprocessing_steps:
                 transform_func = TRANSFORMATIONS.get(transform_name)
 
@@ -70,13 +71,6 @@ class FeatureProcessor:
                     continue
 
                 try:
-                    # Print values that will cause log10 warning
-                    if transform_name in ['log', 'log10', 'log2']:
-                        invalid_mask = df_transformed[feature_name] <= 0
-                        if invalid_mask.any():
-                            invalid_values = df_transformed.loc[invalid_mask, feature_name]
-                            print(f"    - WARNING: Non-positive values found in '{feature_name}' for '{transform_name}':")
-                            print(invalid_values.values)
                     # Apply the function to the entire column (pandas Series)
                     df_transformed[feature_name] = transform_func(df_transformed[feature_name], params)
                     print(f"    - Applied '{transform_name}' successfully.")
@@ -127,9 +121,6 @@ class FeatureProcessor:
 
         # 3. Run inference
         session = ort.InferenceSession(model_path)
-
-        output_names = [output.name for output in session.get_outputs()]
-        print("ONNX model output keys:", output_names)
         
         # Ensure the provided input_name matches the model's expected input name
         model_input_name = session.get_inputs()[0].name
